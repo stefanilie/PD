@@ -12,9 +12,7 @@ import java.io.*;
 class Lacusta
 {
 	static int m, n;
-	//int a[][];
-	ArrayList<ArrayList<Integer>> a = new ArrayList<ArrayList<Integer>>();
-	ArrayList<ArrayList<Integer>> sorted = new ArrayList<ArrayList<Integer>>();
+	int a[][];
 	int nSuma;
 	int step;
 	Lacusta()
@@ -22,45 +20,42 @@ class Lacusta
 		m=0;
 		n=0;
 		nSuma = 0;
-		step = 0;
 	}
 	/*
 	step - va stoca numarul de elemente adaugate in suma. trebuie sa fie =2m.
 	i , j - contorii matricei
 	*/
-	public static void calc(Lacusta l, int step, int i, int j)
+	public static void calc(Lacusta l, int i, int j)
 	{
-		if(i != l.m-1 && step < 2*l.m)
+		if(i > 0 && j > 0)
 		{
-			l.nSuma += l.a.get(i).get(j);
-			System.out.println("+" + l.a.get(i).get(j));
-			step++;
+			int temp = Integer.MAX_VALUE;
+            int next = 0;
+            for(int k=l.n-1; k>=0 ; k--)
+            {
+                if(k != i)
+                if(l.a[i][k]+l.a[i-1][k]<temp)
+                {
+                    temp=l.a[i][k]+l.a[i-1][k];
+                    next=k;
+                }
+            }
+            l.nSuma += temp;
+            System.out.println("+" + temp);
 
-			//iau linia urmatoare din matrice si o sortez
-			ArrayList<Integer> temp = new ArrayList<Integer>();
-			temp = l.a.get(i+1);
-			Collections.sort(temp);
-			//l.sorted.add(temp);
-
-			//apoi iau indexul celui mai mic element
-			int t1 = temp.get(0);
-			t1 = temp.indexOf(t1);
-
-			//si il adaug pe cel de deasupra lui
-			l.nSuma += l.a.get(i).get(t1);
-			calc(l, l.step, i+1, t1);
+			calc(l, i-1, next);
 		}
-		else if(i == l.m-1)
+		if(i == 0)
 		{
-			l.nSuma += l.a.get(i).get(j) + l.a.get(l.m-1).get(l.n-1);
-			step++;
-			step++;
+			l.nSuma += l.a[0][0];
 		}
 	}
 	public static void main(String[] args)
 	{
 		File input = new File("intrare.txt");
 		File output = new File("iesire.txt");
+//care e ideea problemei,
+//care e relatia de recurenta
 
 
 		try
@@ -71,31 +66,32 @@ class Lacusta
 			System.out.println("S-a citit m="+ m);
 			n = Integer.parseInt(sc.next());
 			System.out.println("S-a citit n="+ n);
-			//l.a[][] = new int[m][n];
+			l.a = new int[m][n];
 
 			for(int i = 0; i<m; i++)
 			{
-				ArrayList<Integer> arrTemp = new ArrayList<Integer>();
 				for(int j = 0; j<n; j++)
 				{
 					if(sc.hasNextInt())
 					{
-						//l.a[i][j] = Integer.parseInt(sc.next());
-						arrTemp.add(Integer.parseInt(sc.next()));
-					//	System.out.println("S-a citit " + l.a[i][j] + "si s-a adaugat in a[" +
-					//	 i + "][" + j + "];");
+						l.a[i][j] = sc.nextInt();
 					}
 				}
-				l.a.add(arrTemp);
 			}
 
 			PrintWriter out = new PrintWriter(output);
 
-			out.print(l.a);
-			ArrayList<Integer> arrTemp = new ArrayList<Integer>();
-			arrTemp = l.a.get(0);
-			Collections.sort(arrTemp);
-			calc(l, 0, 0, 0);
+			for(int i = 0; i<m; i++)
+			{
+				for(int j = 0; j<n; j++)
+				{
+					out.print(l.a[i][j] + " ");
+				}
+				out.println();
+			}
+
+			//out.print(l.a);
+			calc(l, l.m-1, l.n-1);
 			System.out.println("Suma: " + l.nSuma + ", step: " + l.step);
 			out.println("Suma: " + l.nSuma + ", step: " + l.step);
 
